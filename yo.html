@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRADA</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #000000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    padding: 40px;
+  }
+
+  /* Container for login/register */
+  .card {
+    background: #0d0d0d;
+    border-radius: 12px;
+    width: 400px;
+    padding: 35px 40px 40px 40px;
+    box-shadow: 0 0 25px #111;
+    text-align: center;
+  }
+
+  h1 {
+    font-weight: 900;
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+    letter-spacing: 3px;
+    user-select: none;
+  }
+
+  input {
+    width: 100%;
+    background: #141414;
+    border: none;
+    padding: 14px 16px;
+    margin-top: 12px;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  input::placeholder {
+    color: #666;
+  }
+
+  button {
+    width: 100%;
+    background: #111111;
+    border: none;
+    padding: 14px;
+    margin-top: 18px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background: #222;
+  }
+
+  button.secondary {
+    background: transparent;
+    color: #999;
+    margin-top: 10px;
+    border: 1.5px solid #222;
+  }
+  button.secondary:hover {
+    background: #222;
+    color: white;
+    border-color: #444;
+  }
+
+  /* DASHBOARD styles */
+  #dashboard {
+    display: none;
+    width: 750px;
+  }
+
+  .nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .nav button {
+    background: #111;
+    color: #aaa;
+    border-radius: 8px;
+    border: none;
+    padding: 10px 18px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  .nav button.active, .nav button:hover {
+    background: #222;
+    color: white;
+  }
+  .nav button.logout {
+    margin-left: auto;
+    background: #111;
+    font-weight: 700;
+  }
+  .nav button.logout:hover {
+    background: #b22222;
+    color: #fff;
+  }
+
+  .panel {
+    background: #0d0d0d;
+    border-radius: 12px;
+    padding: 30px 30px 40px 30px;
+    box-shadow: 0 0 30px #000;
+    color: #ccc;
+  }
+
+  .panel h2 {
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: white;
+    letter-spacing: 1.2px;
+  }
+
+  /* HOME panel */
+  .info-row {
+    margin-bottom: 14px;
+    user-select: text;
+  }
+  .label {
+    font-size: 0.85rem;
+    opacity: 0.5;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .value {
+    margin-top: 4px;
+    background: #111;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #ddd;
+    width: fit-content;
+  }
+
+  /* DOWNLOAD panel */
+  .download-item {
+    background: #111;
+    padding: 18px 24px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    box-shadow: 0 0 10px #000;
+  }
+  .download-item:last-child {
+    margin-bottom: 0;
+  }
+  .download-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .download-icon {
+    width: 24px;
+    height: 24px;
+    stroke: #888;
+    stroke-width: 2.2;
+    fill: none;
+    user-select: none;
+  }
+  .download-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+  }
+  .download-title {
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    color: #eee;
+  }
+  .download-subtitle {
+    font-size: 0.78rem;
+    color: #666;
+    margin-top: 2px;
+    user-select: none;
+  }
+
+  /* Status */
+  .status {
+    font-weight: 700;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+  .status.undetected {
+    color: #0f9d58;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status.undetected svg {
+    stroke: #0f9d58;
+    stroke-width: 2.2;
+    fill: none;
+  }
+  .status.caution {
+    color: #f0a500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status.caution svg {
+    stroke: #f0a500;
+    stroke-width: 2.2;
+    fill: none;
+  }
+
+  /* WELCOME + user on top right */
+  #topBar {
+    position: fixed;
+    top: 20px;
+    right: 40px;
+    font-size: 0.9rem;
+    color: #666;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  #topBar .username {
+    font-weight: 700;
+    color: #ccc;
+  }
+
+  #topBar button {
+    background: #111;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    transition: background 0.3s ease;
+  }
+  #topBar button:hover {
+    background: #222;
+  }
+
+  /* Config Editor styling */
+  #configPanel {
+    background: #0d0d0d;
+    border-radius: 12px;
+    padding: 30px 30px 40px 30px;
+    box-shadow: 0 0 30px #000;
+    color: #ccc;
+    width: 100%;
+    max-width: 750px;
+    box-sizing: border-box;
+  }
+
+  #configPanel h2 {
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: white;
+  }
+
+  #configEditor {
+    width: 100%;
+    height: 220px;
+    background: #141414;
+    border-radius: 8px;
+    border: none;
+    color: #ccc;
+    font-family: 'Source Code Pro', monospace, monospace;
+    font-size: 14px;
+    padding: 15px 20px;
+    resize: vertical;
+    box-sizing: border-box;
+    user-select: text;
+    outline-offset: 0;
+    outline-color: #444;
+    margin-bottom: 20px;
+  }
+
+  #configButtons {
+    display: flex;
+    gap: 15px;
+  }
+
+  #saveConfigBtn, #resetConfigBtn {
+    background: #111;
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    user-select: none;
+    min-width: 120px;
+  }
+
+  #saveConfigBtn:hover {
+    background: #222;
+  }
+
+  #resetConfigBtn {
+    background: #222;
+    color: #666;
+    cursor: default;
+    user-select: none;
+  }
+
+  #resetConfigBtn.enabled {
+    cursor: pointer;
+    color: white;
+    background: #111;
+  }
+  #resetConfigBtn.enabled:hover {
+    background: #222;
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN FORM -->
+<div class="card" id="loginCard">
+  <h1>PRADA</h1>
+  <input type="text" id="user" placeholder="Username" autocomplete="username" />
+  <input type="password" id="pass" placeholder="Password" autocomplete="current-password" />
+  <button onclick="login()">LOGIN</button>
+  <button class="secondary" onclick="showRegister()">REGISTER</button>
+</div>
+
+<!-- REGISTER FORM -->
+<div class="card" id="registerCard" style="display:none;">
+  <h1>REGISTER</h1>
+  <input type="text" id="newUser" placeholder="Create Username" autocomplete="username" />
+  <input type="password" id="license" placeholder="Enter License" />
+  <input type="password" id="newPass" placeholder="Create Password" autocomplete="new-password" />
+  <button onclick="register()">SUBMIT</button>
+  <button class="secondary" onclick="showLogin()">BACK</button>
+</div>
+
+<!-- Top right welcome and logout -->
+<div id="topBar" style="display:none;">
+  <div>Welcome, <span class="username" id="welcomeUser"></span></div>
+  <button onclick="logout()">LOGOUT</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="nav">
+    <button id="navHome" class="active" onclick="showHome()">HOME</button>
+    <button id="navDownload" onclick="showDownload()">DOWNLOAD</button>
+    <button id="navConfig" onclick="showConfig()">CONFIG</button>
+  </div>
+
+  <div class="panel" id="homePanel">
+    <h2>Dashboard Home</h2>
+    <div class="info-row">
+      <div class="label">UID:</div>
+      <div class="value" id="uidValue">*****</div>
+    </div>
+    <div class="info-row">
+      <div class="label">License Key:</div>
+      <div class="value" id="licenseValue">STL**********</div>
+    </div>
+    <div class="info-row">
+      <div class="label">HWID:</div>
+      <div class="value" id="hwidValue">******************</div>
+    </div>
+  </div>
+
+  <div class="panel" id="downloadPanel" style="display:none;">
+    <h2>Downloads</h2>
+
+    <div class="download-item">
+      <div class="download-left">
+        <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <div class="download-text">
+          <div class="download-title">PRADA INTERNAL</div>
+          <div class="download-subtitle">Latest Version</div>
+        </div>
+      </div>
+      <div class="status undetected">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        Undetected
+      </div>
+    </div>
+
+    <div class="download-item">
+      <div class="download-left">
+        <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        <div class="download-text">
+          <div class="download-title">PRADA SCRIPT</div>
+          <div class="download-subtitle">Beta Release</div>
+        </div>
+      </div>
+      <div class="status caution">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <circle cx="12" cy="16" r="1" />
+        </svg>
+        Caution
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="configPanel" style="display:none;">
+    <h2>Configuration Editor</h2>
+    <textarea id="configEditor" spellcheck="false">print("wow")</textarea>
+    <div id="configButtons">
+      <button id="saveConfigBtn">SAVE CHANGES</button>
+      <button id="resetConfigBtn" disabled>RESET</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let savedUser = "admin";
+  let savedPass = "steel";
+
+  function setActiveNav(buttonId) {
+    const navButtons = document.querySelectorAll('.nav button');
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    document.getElementById(buttonId).classList.add('active');
+  }
+
+  function login() {
+    const u = document.getElementById('user').value.trim();
+    const p = document.getElementById('pass').value.trim();
+
+    if (u === savedUser && p === savedPass) {
+      document.getElementById('loginCard').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('topBar').style.display = 'flex';
+      document.getElementById('welcomeUser').textContent = u;
+      showHome();
+    } else {
+      alert("Invalid login.");
+    }
+  }
+
+  function logout() {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('topBar').style.display = 'none';
+    clearInputs();
+  }
+
+  function clearInputs() {
+    document.getElementById('user').value = '';
+    document.getElementById('pass').value = '';
+    document.getElementById('newUser').value = '';
+    document.getElementById('license').value = '';
+    document.getElementById('newPass').value = '';
+  }
+
+  function showRegister() {
+    clearInputs();
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('registerCard').style.display = 'block';
+  }
+
+  function showLogin() {
+    clearInputs();
+    document.getElementById('registerCard').style.display = 'none';
+    document.getElementById('loginCard').style.display = 'block';
+  }
+
+  function register() {
+    const newUser = document.getElementById('newUser').value.trim();
+    const newPass = document.getElementById('newPass').value.trim();
+
+    if (newUser === "" || newPass === "") {
+      alert("Please enter username and password.");
+      return;
+    }
+
+    savedUser = newUser;
+    savedPass = newPass;
+
+    alert("Account created.");
+    showLogin();
+  }
+
+  function showHome() {
+    setActiveNav('navHome');
+    document.getElementById('homePanel').style.display = 'block';
+    document.getElementById('downloadPanel').style.display = 'none';
+    document.getElementById('configPanel').style.display = 'none';
+  }
+
+  function showDownload() {
+    setActiveNav('navDownload');
+    document.getElementById('homePanel').style.display = 'none';
+    document.getElementById('downloadPanel').style.display = 'block';
+    document.getElementById('configPanel').style.display = 'none';
+  }
+
+  function showConfig() {
+    setActiveNav('navConfig');
+    document.getElementById('homePanel').style.display = 'none';
+    document.getElementById('downloadPanel').style.display = 'none';
+    document.getElementById('configPanel').style.display = 'block';
+  }
+
+  // Config Editor Logic
+  const configEditor = document.getElementById('configEditor');
+  const saveBtn = document.getElementById('saveConfigBtn');
+  const resetBtn = document.getElementById('resetConfigBtn');
+
+  const defaultConfig = `print("wow")`;
+
+  function updateResetButtonState() {
+    if (configEditor.value !== defaultConfig) {
+      resetBtn.disabled = false;
+      resetBtn.classList.add('enabled');
+    } else {
+      resetBtn.disabled = true;
+      resetBtn.classList.remove('enabled');
+    }
+  }
+
+  saveBtn.addEventListener('click', () => {
+    alert('Configuration saved!');
+    updateResetButtonState();
+  });
+
+  resetBtn.addEventListener('click', () => {
+    if (!resetBtn.disabled) {
+      configEditor.value = defaultConfig;
+      updateResetButtonState();
+    }
+  });
+
+  configEditor.addEventListener('input', updateResetButtonState);
+
+  updateResetButtonState();
+</script>
+</body>
+</html>
